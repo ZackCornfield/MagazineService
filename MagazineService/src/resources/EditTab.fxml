@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane id="AnchorPane" prefHeight="441.0" prefWidth="800.0" xmlns:fx="http://javafx.com/fxml/1" fx:controller="magazine_service.EditTabController">
+   <children>
+      <TabPane prefHeight="520.0" prefWidth="800.0" tabClosingPolicy="UNAVAILABLE">
+        <tabs>
+          <Tab text="Customers">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <Label layoutX="319.0" layoutY="27.0" text="Edit Customers">
+                           <font>
+                              <Font name="Arial Bold" size="22.0" />
+                           </font>
+                        </Label>
+                        <TableView fx:id="editCustomerTable" layoutX="42.0" layoutY="81.0" prefHeight="359.0" prefWidth="716.0" />
+                        <Button fx:id="addCustomerButton" layoutX="42.0" layoutY="450.0" mnemonicParsing="false" onAction="#addCustomer" text="Add Customer" />
+                        <Button fx:id="deleteCustomerButton" layoutX="652.0" layoutY="450.0" mnemonicParsing="false" onAction="#deleteCustomer" text="Delete Customer" />
+                        <Button fx:id="generateBillButton" layoutX="358.0" layoutY="450.0" mnemonicParsing="false" onAction="#generateBill" text="Generate Bill" />
+                     </children>
+                  </AnchorPane>
+            </content>
+          </Tab>
+          <Tab text="Supplements">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <Label layoutX="305.0" layoutY="26.0" prefHeight="26.0" prefWidth="190.0" text="Edit Supplements">
+                           <font>
+                              <Font name="Arial Bold" size="22.0" />
+                           </font>
+                        </Label>
+                        <TableView fx:id="editSupplementTable" layoutX="236.0" layoutY="65.0" prefHeight="359.0" prefWidth="327.0" />
+                        <Button fx:id="addSupplementButton" layoutX="42.0" layoutY="450.0" mnemonicParsing="false" onAction="#addSupplement" text="Add Supplement" />
+                        <Button fx:id="deleteSupplementButton" layoutX="640.0" layoutY="450.0" mnemonicParsing="false" onAction="#deleteSupplement" text="Delete Supplement" />
+                     </children>
+                  </AnchorPane>
+            </content>
+          </Tab>
+        </tabs>
+      </TabPane>
+   </children>
+</AnchorPane>
