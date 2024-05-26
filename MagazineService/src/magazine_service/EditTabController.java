@@ -3,6 +3,7 @@ package magazine_service;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -99,19 +100,28 @@ public class EditTabController {
             }
         });
 
-        TableColumn<Customer, Integer> streetNumberColumn = new TableColumn<>("Street Number");
-        streetNumberColumn.setCellValueFactory(new PropertyValueFactory<>("streetNumber"));
-        streetNumberColumn.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
+        TableColumn<Customer, String> streetNumberColumn = new TableColumn<>("Street Number");
+        streetNumberColumn.setCellValueFactory(cellData -> {
+            Integer value = cellData.getValue().getStreetNumber();
+            return new SimpleStringProperty(value != null ? String.valueOf(value) : "");
+        });
+        streetNumberColumn.setCellFactory(TextFieldTableCell.forTableColumn());
 
         // Add listener to the table columns for edit commit events
         streetNumberColumn.setOnEditCommit(event -> {
             Customer customer = event.getRowValue();
-            Integer newValue = event.getNewValue();
-            if (newValue == null || newValue <= 0) {
+            String newValue = event.getNewValue();
+            try {
+                Integer streetNumber = Integer.valueOf(newValue); 
+                if (streetNumber != null && streetNumber > 0) {
+                    customer.setStreetNumber(streetNumber);
+                } else {
+                    showAlert(Alert.AlertType.ERROR, "Form Error!", "Please enter a valid street number greater than zero.");
+                    editCustomerTable.refresh();
+                }
+            } catch (NumberFormatException ex) {
                 showAlert(Alert.AlertType.ERROR, "Form Error!", "Please enter a valid street number greater than zero.");
-                editCustomerTable.refresh();
-            } else {
-                customer.setStreetNumber(newValue);
+                editCustomerTable.refresh(); 
             }
         });
 
@@ -227,12 +237,12 @@ public class EditTabController {
         });
 
         ObservableList<String> payingCustomers = FXCollections.observableArrayList();
+        updatePayingCustomersList(payingCustomers); // Initial update
 
-        for (Customer customer : magazineService.getCustomers()) {
-            if (customer instanceof PayingCustomer) {
-                payingCustomers.add(customer.getName());
-            }
-        }
+        // Add an observer to the customerData list
+        customerData.addListener((Observable observable) -> {
+            updatePayingCustomersList(payingCustomers);
+        });
 
         TableColumn<Customer, String> payingCustomerColumn = new TableColumn<>("Paying Customer");
         payingCustomerColumn.setCellValueFactory(cellData -> {
@@ -304,8 +314,16 @@ public class EditTabController {
         editCustomerTable.setItems(customerData);
         editCustomerTable.setEditable(true);
     }
-
     
+    private void updatePayingCustomersList(ObservableList<String> payingCustomers) {
+        payingCustomers.clear();
+        for (Customer customer : customerData) {
+            if (customer instanceof PayingCustomer) {
+                payingCustomers.add(customer.getName());
+            }
+        }
+    }
+
     private void initializeSupplementTable() {
         supplementData.addAll(magazineService.getMagazine().getSupplements());
 
@@ -389,10 +407,13 @@ public class EditTabController {
                 PayingCustomer payingCustomer = new PayingCustomer();
                 // Add an empty PayingCustomer to the data list
                 customerData.add(payingCustomer);
+                magazineService.addCustomer(payingCustomer);
             } else if (customerType.equals("Associate Customer")) {
                 AssociateCustomer associateCustomer = new AssociateCustomer();
+                associateCustomer.setPayingCustomer(magazineService.getPayingCustomers().get(0)); 
                 // Add an empty AssociateCustomer to the data list
                 customerData.add(associateCustomer);
+                magazineService.addCustomer(associateCustomer);
             }
         });
     }
@@ -482,21 +503,11 @@ public class EditTabController {
         // Retrieve the billing history of the paying customer
         BillingHistory billingHistory = payingCustomer.getBillingHistory();
 
-        // Get the list of subscribed supplements for the paying customer
-        List<Supplement> subscribedSupplements = payingCustomer.getSubscribedSupplements();
-
-        // Get the list of associated customers for the paying customer
-        List<AssociateCustomer> associateCustomers = payingCustomer.getAssociateCustomers();
-
-        // Set the payment method for the bill (assuming it's already set)
-        PaymentMethod paymentMethod = payingCustomer.getPaymentMethod();
-
         // Get the magazine cost (you need to define this value)
         double magazineCost = magazineService.getMagazine().getMainPartCost();
-        System.out.println(magazineService.getMagazine().getMainPartCost());
 
         // Generate the bill for the paying customer
-        billingHistory.generateBill(subscribedSupplements, associateCustomers, paymentMethod, magazineCost);
+        billingHistory.generateBill(payingCustomer, magazineCost);
     }
 
     private void showAlert(Alert.AlertType alertType, String title, String message) {

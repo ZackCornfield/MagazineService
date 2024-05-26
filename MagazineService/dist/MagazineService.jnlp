@@ -8,7 +8,7 @@
   </information>
   <resources>
     <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
-    <jar href="MagazineService.jar" size="43149" download="eager" />
+    <jar href="MagazineService.jar" size="48067" download="eager" />
   </resources>
   <jfx:javafx-desc  width="800" height="600" main-class="magazine_service.Main"  name="MagazineService" />
   <update check="always"/>

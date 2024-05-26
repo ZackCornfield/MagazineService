@@ -4,38 +4,44 @@
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="530.0" prefWidth="800.0" xmlns:fx="http://javafx.com/fxml/1" fx:controller="magazine_service.ViewTabController">
+<AnchorPane prefHeight="530.0" prefWidth="800.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/21" fx:controller="magazine_service.ViewTabController">
    <children>
-      <AnchorPane layoutY="265.0" prefHeight="265.0" prefWidth="400.0" style="-fx-border-color: #10667a;">
+      <HBox prefHeight="265.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="265.0">
          <children>
-            <Label layoutX="132.0" layoutY="15.0" text="List of Customers">
-               <font>
-                  <Font name="Arial Bold" size="16.0" />
-               </font>
-            </Label>
-            <ListView fx:id="customerList" layoutX="100.0" layoutY="43.0" prefHeight="200.0" prefWidth="200.0" />
+            <VBox prefHeight="265.0" prefWidth="400.0" style="-fx-border-color: #10667a;">
+               <children>
+                  <Label text="List of Customers">
+                     <font>
+                        <Font name="Arial Bold" size="16.0" />
+                     </font>
+                  </Label>
+                  <ListView fx:id="customerList" VBox.vgrow="ALWAYS" />
+               </children>
+            </VBox>
+            <VBox prefHeight="265.0" prefWidth="400.0" style="-fx-border-color: #10667a;">
+               <children>
+                  <Label text="List of Supplements">
+                     <font>
+                        <Font name="Arial Bold" size="16.0" />
+                     </font>
+                  </Label>
+                  <ListView fx:id="supplementList" VBox.vgrow="ALWAYS" />
+               </children>
+            </VBox>
          </children>
-      </AnchorPane>
-      <AnchorPane prefHeight="265.0" prefWidth="400.0" style="-fx-border-color: #10667a;">
+      </HBox>
+      <AnchorPane prefHeight="265.0" prefWidth="800.0" style="-fx-border-color: #10667a;" AnchorPane.bottomAnchor="265.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <Label layoutX="123.0" layoutY="15.0" text="List of Supplements">
+            <Label layoutX="332.0" layoutY="25.0" text="Information Panel">
                <font>
                   <Font name="Arial Bold" size="16.0" />
                </font>
             </Label>
-            <ListView fx:id="supplementList" layoutX="100.0" layoutY="43.0" prefHeight="200.0" prefWidth="200.0" />
-         </children>
-      </AnchorPane>
-      <AnchorPane layoutX="400.0" prefHeight="530.0" prefWidth="400.0" style="-fx-border-color: #10667a;">
-         <children>
-            <Label layoutX="132.0" layoutY="24.0" text="Information Panel">
-               <font>
-                  <Font name="Arial Bold" size="16.0" />
-               </font>
-            </Label>
-            <TextArea fx:id="informationPanel" layoutX="24.0" layoutY="55.0" prefHeight="429.0" prefWidth="351.0" />
+            <TextArea fx:id="informationPanel" layoutX="24.0" layoutY="55.0" AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="24.0" AnchorPane.rightAnchor="24.0" AnchorPane.topAnchor="55.0" />
          </children>
       </AnchorPane>
    </children>

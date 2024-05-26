@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane id="AnchorPane" prefHeight="530.0" prefWidth="800.0" xmlns:fx="http://javafx.com/fxml/1" fx:controller="magazine_service.ViewTabController">
+   <children>
+      <AnchorPane layoutY="265.0" prefHeight="265.0" prefWidth="400.0" style="-fx-border-color: #10667a;">
+         <children>
+            <Label layoutX="132.0" layoutY="15.0" text="List of Customers">
+               <font>
+                  <Font name="Arial Bold" size="16.0" />
+               </font>
+            </Label>
+            <ListView fx:id="customerList" layoutX="100.0" layoutY="43.0" prefHeight="200.0" prefWidth="200.0" />
+         </children>
+      </AnchorPane>
+      <AnchorPane prefHeight="265.0" prefWidth="400.0" style="-fx-border-color: #10667a;">
+         <children>
+            <Label layoutX="123.0" layoutY="15.0" text="List of Supplements">
+               <font>
+                  <Font name="Arial Bold" size="16.0" />
+               </font>
+            </Label>
+            <ListView fx:id="supplementList" layoutX="100.0" layoutY="43.0" prefHeight="200.0" prefWidth="200.0" />
+         </children>
+      </AnchorPane>
+      <AnchorPane layoutX="400.0" prefHeight="530.0" prefWidth="400.0" style="-fx-border-color: #10667a;">
+         <children>
+            <Label layoutX="132.0" layoutY="24.0" text="Information Panel">
+               <font>
+                  <Font name="Arial Bold" size="16.0" />
+               </font>
+            </Label>
+            <TextArea fx:id="informationPanel" layoutX="24.0" layoutY="55.0" prefHeight="429.0" prefWidth="351.0" />
+         </children>
+      </AnchorPane>
+   </children>
+</AnchorPane>

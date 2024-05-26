@@ -108,7 +108,7 @@ public class ViewTabController {
         informationPanel.setText(sb.toString());
     }
     
-        private void displayCustomerInformation(Customer customer) {
+    private void displayCustomerInformation(Customer customer) {
         StringBuilder sb = new StringBuilder();
         sb.append("Name: ").append(customer.getName()).append("\n");
         sb.append("Email: ").append(customer.getEmailAddress()).append("\n");
@@ -131,38 +131,7 @@ public class ViewTabController {
                 sb.append("• ").append(subscribedSupplement.getName()).append("\n");
             }
             sb.append("\n");
-
-            for (Bill bill : payingCustomer.getBillingHistory().getBills()) {
-                // Loop through each bill
-                sb.append("-- New Monthly Magazine Payment Email --\n");
-                sb.append("Sent To: ").append(customer.getEmailAddress()).append("\n\n");
-                sb.append("Dear ").append(customer.getName()).append(",\n\n");
-                sb.append("We hope this email finds you well.\n\n");
-                sb.append("Here is your monthly subscription summary:\n\n");
-                sb.append("Subscribed Supplements:\n");
-                for (Supplement supplement : bill.getSubscribedSupplements()) {
-                    sb.append("    • ").append(supplement.getName()).append(": $").append(supplement.getWeeklyCost() * 4).append("\n");
-                }
-                sb.append("\n");
-                sb.append("Associated Customers:\n");
-                for (AssociateCustomer assocCustomer : bill.getAssociateCustomers()) {
-                    sb.append("    • ").append(assocCustomer.getName()).append(": $").append(bill.calculateAssociateCustomerCost(assocCustomer)).append("\n");
-                }
-                sb.append("\n");
-                sb.append("Magazine Cost: $").append(bill.getMagazineCost()).append("\n");
-                sb.append("Total Cost: $").append(bill.getTotalCost()).append("\n");
-                sb.append("Payment Method:\n");
-                sb.append("    • Payment Type: ").append(bill.getPaymentMethod().getPaymentType()).append("\n");
-                if (bill.getPaymentMethod().getPaymentType() == PaymentMethod.PaymentType.CREDIT_DEBIT_CARD) {
-                    sb.append("    • Credit Card: ").append(bill.getPaymentMethod().getAccountNumber()).append("\n");
-                } else {
-                    sb.append("    • Bank Account: ").append(bill.getPaymentMethod().getAccountNumber()).append("\n");
-                }
-                sb.append("\n");
-            }
-            sb.append("Thank you for your continued subscription.\n\n");
-            sb.append("Best regards,\n");
-            sb.append("Your Magazine Service Team");
+            sb.append(payingCustomer.getBillingHistory().getBillingHistory());
         } else if (customer instanceof AssociateCustomer) {
             sb.append("Subscriptions:\n");
             for (Supplement subscribedSupplement : customer.getSubscribedSupplements()) {

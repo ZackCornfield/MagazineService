@@ -112,6 +112,6 @@ public class PayingCustomer extends Customer implements Serializable{
      * @param magazineCost The cost of the magazine.    
      */
     public void generateBill(double magazineCost) {
-        billingHistory.generateBill(getSubscribedSupplements(), associateCustomers, paymentMethod, magazineCost);
+        billingHistory.generateBill(this, magazineCost);
     }
 }

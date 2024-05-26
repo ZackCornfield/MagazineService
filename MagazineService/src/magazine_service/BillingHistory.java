@@ -3,6 +3,12 @@ package magazine_service;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.Future;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorCompletionService;
 
 /**
  * The BillingHistory class represents the billing history of a paying customer.
@@ -36,46 +42,89 @@ public class BillingHistory implements Serializable {
      * Generates a bill for the current month based on the subscribed supplements and
      * associated customers costs, and adds it to the billing history.
      * 
-     * @param subscribedSupplements The list of subscribed supplements.
-     * @param associateCustomers The list of associated customers.
-     * @param paymentMethod PaymentMethod instance 
+     * @param payingCustomer Paying Customer to generate bill for 
      * @param magazineCost Cost of the magazine 
      */
-    public void generateBill(List<Supplement> subscribedSupplements, List<AssociateCustomer> associateCustomers, PaymentMethod paymentMethod, double magazineCost) {
-        Bill bill = new Bill(subscribedSupplements, associateCustomers, paymentMethod, magazineCost);
+    public void generateBill(PayingCustomer payingCustomer, double magazineCost) {
+        Bill bill = new Bill(payingCustomer.getName(), payingCustomer.getEmailAddress(), payingCustomer.getSubscribedSupplements(), payingCustomer.getAssociateCustomers(), payingCustomer.getPaymentMethod(), magazineCost);
         bills.add(bill);
     }
     
     /**
-     * Prints the billing history in a nice format.
+     * Returns the billing history in a string 
+     * @return String
      */
-    public void printBillingHistory() {
-        System.out.println("Billing History:");
-        System.out.println("-----------------------------------------------------------------");
+    public String getBillingHistory() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Billing History:\n");
+        sb.append("-----------------------------------------------------------------\n");
+
+        // Create a thread pool
+        ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        CompletionService<String> completionService = new ExecutorCompletionService<>(executor);
+
+        // Submit tasks to print each bill in a separate thread
         for (int i = 0; i < bills.size(); i++) {
-            Bill bill = bills.get(i);
-            System.out.println("Bill " + (i + 1) + ":");
-            System.out.println("Subscribed Supplements:");
-            for (Supplement supplement : bill.getSubscribedSupplements()) {
-                System.out.println("- " + supplement.getName() + ": $" + supplement.getWeeklyCost() * 4);
-            }
-            System.out.println("Associated Customers:");
-            for (AssociateCustomer associateCustomer : bill.getAssociateCustomers()) {
-                System.out.println("- " + associateCustomer.getName() + ": $" + bill.calculateAssociateCustomerCost(associateCustomer));
-            }
-            System.out.println("Magazine Cost: $" + bill.getMagazineCost());
-            System.out.println("Total Cost: $" + bill.getTotalCost());
-            System.out.println("Payment Method: ");
-            System.out.println("Payment Type: " + bill.getPaymentMethod().getPaymentType()); 
-            if(bill.getPaymentMethod().getPaymentType() == PaymentMethod.PaymentType.CREDIT_DEBIT_CARD) {
-                System.out.println("• Credit Card: " + bill.getPaymentMethod().getAccountNumber()); 
-            }
-            else
-            {
-                System.out.println("• Bank Account: " + bill.getPaymentMethod().getAccountNumber()); 
-            }
-            System.out.println("-----------------------------------------------------------------");
+            final int index = i;
+            completionService.submit(new Callable<String>() {
+                @Override
+                public String call() throws Exception {
+                    return generateBillString(index);
+                }
+            });
         }
+
+        // Wait for all tasks to complete and append the results to the StringBuilder
+        for (int i = 0; i < bills.size(); i++) {
+            try {
+                Future<String> future = completionService.take();
+                sb.append(future.get());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        executor.shutdown();
+        sb.append("-----------------------------------------------------------------\n");
+        return sb.toString();
+    }
+
+    /**
+     * Generates the billing history string for a given index 
+     * @return String
+     */
+    private String generateBillString(int index) {
+        StringBuilder sb = new StringBuilder();
+        Bill bill = bills.get(index);
+        sb.append("-- New Monthly Magazine Payment Email --\n");
+        sb.append("Sent To: ").append(bill.getEmailAddress()).append("\n\n");
+        sb.append("Dear ").append(bill.getName()).append(",\n\n");
+        sb.append("We hope this email finds you well.\n\n");
+        sb.append("Here is your monthly subscription summary:\n\n");
+        sb.append("Subscribed Supplements:\n");
+        for (Supplement supplement : bill.getSubscribedSupplements()) {
+            sb.append("    • ").append(supplement.getName()).append(": $").append(supplement.getWeeklyCost() * 4).append("\n");
+        }
+        sb.append("\n");
+        sb.append("Associated Customers:\n");
+        for (AssociateCustomer assocCustomer : bill.getAssociateCustomers()) {
+            sb.append("    • ").append(assocCustomer.getName()).append(": $").append(bill.calculateAssociateCustomerCost(assocCustomer)).append("\n");
+        }
+        sb.append("\n");
+        sb.append("Magazine Cost: $").append(bill.getMagazineCost()).append("\n");
+        sb.append("Total Cost: $").append(bill.getTotalCost()).append("\n");
+        sb.append("Payment Method:\n");
+        sb.append("    • Payment Type: ").append(bill.getPaymentMethod().getPaymentType()).append("\n");
+        if (bill.getPaymentMethod().getPaymentType() == PaymentMethod.PaymentType.CREDIT_DEBIT_CARD) {
+            sb.append("    • Credit Card: ").append(bill.getPaymentMethod().getAccountNumber()).append("\n");
+        } else {
+            sb.append("    • Bank Account: ").append(bill.getPaymentMethod().getAccountNumber()).append("\n");
+        }
+        sb.append("\n");
+        sb.append("Thank you for your continued subscription.\n\n");
+        sb.append("Best regards,\n");
+        sb.append("Your Magazine Service Team\n\n");
+        return sb.toString();
     }
 }
 
@@ -92,8 +141,12 @@ class Bill implements Serializable {
     private double magazineCost; 
     private double totalCost;
     private PaymentMethod paymentMethod; 
+    private String name;
+    private String emailAddress;
 
-    public Bill(List<Supplement> subscribedSupplements, List<AssociateCustomer> associateCustomers, PaymentMethod paymentMethod, double magazineCost) {
+    public Bill(String name, String emailAddress, List<Supplement> subscribedSupplements, List<AssociateCustomer> associateCustomers, PaymentMethod paymentMethod, double magazineCost) {
+        this.name = name; 
+        this.emailAddress = emailAddress; 
         this.subscribedSupplements = subscribedSupplements;
         this.associateCustomers = associateCustomers;
         this.paymentMethod = paymentMethod; 
@@ -141,6 +194,14 @@ class Bill implements Serializable {
         return total;
     }
 
+    public String getName() {
+        return name;
+    }
+    
+    public String getEmailAddress() {
+        return emailAddress; 
+    }
+    
     /**
      * Retrieves the list of subscribed supplements in this bill.
      * 
